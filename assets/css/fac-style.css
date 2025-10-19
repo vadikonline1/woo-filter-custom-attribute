@@ -1,0 +1,145 @@
+/* FAC Filter Styles */
+.fac-filter {
+    margin: 15px 0;
+}
+
+.fac-filter-form {
+    display: block;
+}
+
+/* Checkbox Styles - Fiecare pe rând nou */
+.fac-filter-label {
+    display: flex;
+    align-items: center;
+    margin: 8px 0;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1.4;
+    padding: 8px 0;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.fac-filter-label:last-child {
+    border-bottom: none;
+}
+
+.fac-filter-label:hover {
+    background-color: #f8f9fa;
+    padding-left: 8px;
+    padding-right: 8px;
+    margin-left: -8px;
+    margin-right: -8px;
+    border-radius: 4px;
+}
+
+.fac-filter-label.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.fac-filter-label input[type="checkbox"] {
+    margin-right: 12px;
+    transform: scale(1.1);
+    flex-shrink: 0;
+}
+
+.fac-filter-text {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.fac-filter-name {
+    flex-grow: 1;
+    margin-right: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fac-filter-count {
+    font-size: 0.85em;
+    font-weight: 500;
+    flex-shrink: 0;
+    background: #f8f9fa;
+    padding: 2px 8px;
+    border-radius: 12px;
+    min-width: 40px;
+    text-align: center;
+}
+
+/* Select Styles */
+.fac-select,
+.fac-multiselect {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: white;
+    margin-bottom: 10px;
+}
+
+.fac-multiselect {
+    height: auto;
+    min-height: 120px;
+}
+
+.fac-select:focus,
+.fac-multiselect:focus {
+    outline: none;
+}
+
+/* Button Styles - Folosim doar stilurile default */
+.fac-filter-btn {
+    padding: 10px 16px;
+    margin-top: 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    width: 100%;
+    transition: all 0.2s ease;
+}
+
+/* Active filter states */
+.fac-filter-label input[type="checkbox"]:checked + .fac-filter-text .fac-filter-count {
+    color: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .fac-filter-label {
+        font-size: 16px;
+        padding: 10px 0;
+    }
+    
+    .fac-select,
+    .fac-multiselect {
+        padding: 12px;
+        font-size: 16px;
+    }
+    
+    .fac-filter-count {
+        font-size: 14px;
+        min-width: 44px;
+    }
+}
+
+/* Loading state */
+.fac-filter-label input[type="checkbox"]:disabled {
+    cursor: not-allowed;
+}
+
+/* Focus states for accessibility */
+.fac-filter-label:focus-within {
+    background-color: #e7f3ff;
+}
+
+.fac-checkbox:focus {
+    outline: 2px solid;
+    outline-offset: 2px;
+}
