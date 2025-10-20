@@ -21,6 +21,7 @@ class FAC_Filters_List_Table extends WP_List_Table {
     public function get_columns() {
         return [
             'cb'        => '<input type="checkbox" />',
+            'id'        => 'ID',
             'label'     => 'Label',
             'taxonomy'  => 'Taxonomie',
             'type'      => 'Tip afișare',
@@ -33,6 +34,10 @@ class FAC_Filters_List_Table extends WP_List_Table {
             '<input type="checkbox" name="filters[]" value="%s" />',
             $item['index']
         );
+    }
+
+    public function column_id( $item ) {
+        return '<strong>' . $item['index'] . '</strong>';
     }
 
     public function column_label( $item ) {
