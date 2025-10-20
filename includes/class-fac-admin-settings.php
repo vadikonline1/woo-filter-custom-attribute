@@ -470,29 +470,115 @@ class FAC_Admin_Settings {
                 </div>
             </div>
 
-            <!-- Modal pentru instrucțiuni -->
-            <div id="fac-instructions-modal" class="fac-modal" style="display: none;">
-                <div class="fac-modal-content">
-                    <div class="fac-modal-header">
-                        <h2>Instrucțiuni FAC Filter</h2>
-                        <span class="fac-modal-close">&times;</span>
+<!-- Modal pentru instrucțiuni -->
+<div id="fac-instructions-modal" class="fac-modal" style="display: none;">
+    <div class="fac-modal-content" style="max-width: 700px;">
+        <div class="fac-modal-header">
+            <h2>Instrucțiuni FAC Filter</h2>
+            <span class="fac-modal-close">&times;</span>
+        </div>
+        <div class="fac-modal-body">
+            <h3>Configurare si Adăugarea Widget-urilor</h3>
+            <ol>
+                <li><strong>Configurează filtrele</strong> în această pagină folosind butonul "Adaugă Filtru Nou"</li>
+                <li><strong>Tip taxonomie:</strong> Poți alege dintre taxonomiile existente sau introduce una custom</li>
+                <li><strong>Taxonomii custom:</strong> Introdu slug-ul taxonomiei tale custom (ex: custom_size, location, etc.)</li>
+                <li><strong>Mergi la Apariție → Widgets</strong> și adaugă widget-ul "FAC - Filter" în sidebar-ul shop-ului</li>
+                <li><strong>În widget</strong>, selectează filtru din lista celor configurate aici</li>
+                <li><strong>Filtrele active</strong> vor apărea automat în secțiunea "Filtre active" WooCommerce</li>
+            </ol>
+
+            <h3>Shortcode-uri pentru meniu</h3>
+            <p>Copiază și lipește aceste shortcode-uri în orice pagină/post:</p>
+            
+            <div class="fac-shortcode-examples">
+                <div class="fac-shortcode-item">
+                    <label>Meniu orizontal:</label>
+                    <div class="fac-code-block">
+                        <code>[fac-menu fac-position="orizontal" fac-filter-id="0,1,2"]</code>
+                        <button type="button" class="fac-copy-btn" data-code='[fac-menu fac-position="orizontal" fac-filter-id="0,1,2"]'>
+                            Copiază
+                        </button>
                     </div>
-                    <div class="fac-modal-body">
-                        <ol>
-                            <li><strong>Configurează filtrele</strong> în această pagină folosind butonul "Adaugă Filtru Nou"</li>
-                            <li><strong>Tip taxonomie:</strong> Poți alege dintre taxonomiile existente sau introduce una custom</li>
-                            <li><strong>Taxonomii custom:</strong> Introdu slug-ul taxonomiei tale custom (ex: custom_size, location, etc.)</li>
-                            <li><strong>Mergi la Apariție → Widgets</strong> și adaugă widget-ul "FAC - Filter" în sidebar-ul shop-ului</li>
-                            <li><strong>În widget</strong>, selectează filtru din lista celor configurate aici</li>
-                            <li><strong>Filtrele active</strong> vor apărea automat în secțiunea "Filtre active" WooCommerce</li>
-                        </ol>
+                </div>
+                
+                <div class="fac-shortcode-item">
+                    <label>Meniu vertical:</label>
+                    <div class="fac-code-block">
+                        <code>[fac-menu fac-position="vertical" fac-filter-id="0,1"]</code>
+                        <button type="button" class="fac-copy-btn" data-code='[fac-menu fac-position="vertical" fac-filter-id="0,1"]'>
+                            Copiază
+                        </button>
                     </div>
-                    <div class="fac-modal-footer">
-                        <button type="button" class="button button-primary fac-modal-close">Am înțeles</button>
+                </div>
+                
+                <div class="fac-shortcode-item">
+                    <label>Cu clasă custom:</label>
+                    <div class="fac-code-block">
+                        <code>[fac-menu fac-position="orizontal" fac-filter-id="0,1,2" fac-class="my-custom-menu"]</code>
+                        <button type="button" class="fac-copy-btn" data-code='[fac-menu fac-position="orizontal" fac-filter-id="0,1,2" fac-class="my-custom-menu"]'>
+                            Copiază
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="fac-shortcode-item">
+                    <label>Un singur filtru:</label>
+                    <div class="fac-code-block">
+                        <code>[fac-menu fac-filter-id="0"]</code>
+                        <button type="button" class="fac-copy-btn" data-code='[fac-menu fac-filter-id="0"]'>
+                            Copiază
+                        </button>
                     </div>
                 </div>
             </div>
+
+            <div class="fac-shortcode-info">
+                <h4>Cum să folosești ID-urile filtrelor:</h4>
+                <p>Înlocuiește <code>0,1,2</code> cu ID-urile filtrelor tale din tabelul de mai sus.</p>
+                <p>Exemplu: Dacă ai filtrele cu ID-urile 0, 1 și 3, folosește: <code>[fac-menu fac-filter-id="0,1,3"]</code></p>
+            </div>
         </div>
+        <div class="fac-modal-footer">
+            <button type="button" class="button button-primary fac-modal-close">Am înțeles</button>
+        </div>
+    </div>
+</div>
+
+<script>
+jQuery(document).ready(function($) {
+    // Funcție pentru copiere shortcode
+    $('.fac-copy-btn').on('click', function(e) {
+        e.preventDefault();
+        
+        var $btn = $(this);
+        var code = $btn.data('code');
+        
+        // Creează un element temporar pentru copiere
+        var $temp = $('<textarea>');
+        $('body').append($temp);
+        $temp.val(code).select();
+        
+        // Încearcă să copieze
+        try {
+            var successful = document.execCommand('copy');
+            if (successful) {
+                // Feedback vizual
+                var originalText = $btn.text();
+                $btn.text('Copiat!').addClass('copied');
+                
+                setTimeout(function() {
+                    $btn.text(originalText).removeClass('copied');
+                }, 2000);
+            }
+        } catch (err) {
+            console.log('Nu s-a putut copia textul: ', err);
+        }
+        
+        $temp.remove();
+    });
+});
+</script>
 
         <style>
         .fac-modal {
@@ -512,7 +598,7 @@ class FAC_Admin_Settings {
             padding: 0;
             border: 1px solid #ccd0d4;
             border-radius: 4px;
-            width: 600px;
+            width: 700px;
             max-width: 90%;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
@@ -585,6 +671,102 @@ class FAC_Admin_Settings {
         .taxonomy-custom {
             background: #dc3232;
             color: white;
+        }
+        
+        
+        /* Stiluri pentru Instructiunii */
+        .fac-shortcode-examples {
+            margin: 20px 0;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .fac-shortcode-item {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            background: #fafafa;
+        }
+        
+        .fac-shortcode-item:last-child {
+            border-bottom: none;
+        }
+        
+        .fac-shortcode-item label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .fac-code-block {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .fac-code-block code {
+            flex: 1;
+            background: none;
+            border: none;
+            padding: 0;
+            color: #333;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        
+        .fac-copy-btn {
+            background: #007cba;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .fac-copy-btn:hover {
+            background: #005a87;
+            transform: translateY(-1px);
+        }
+        
+        .fac-copy-btn.copied {
+            background: #46b450;
+        }
+        
+        .fac-shortcode-info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            border-left: 4px solid #007cba;
+        }
+        
+        .fac-shortcode-info h4 {
+            margin: 0 0 10px 0;
+            color: #007cba;
+        }
+        
+        .fac-shortcode-info p {
+            margin: 5px 0;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .fac-shortcode-info code {
+            background: #f1f1f1;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 12px;
         }
         </style>
         <?php
