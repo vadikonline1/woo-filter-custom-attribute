@@ -60,7 +60,13 @@ class FAC_Filters_List_Table extends WP_List_Table {
     }
 
     public function column_taxonomy( $item ) {
-        return '<code>' . esc_html( $item['taxonomy'] ) . '</code>';
+        // Verifică dacă taxonomia există
+        $taxonomy_exists = taxonomy_exists( $item['taxonomy'] );
+        $status = $taxonomy_exists ? 
+            '<span style="color: #46b450;">✓ Există</span>' : 
+            '<span style="color: #dc3232;">✗ Custom</span>';
+        
+        return '<code>' . esc_html( $item['taxonomy'] ) . '</code> ' . $status;
     }
 
     public function column_type( $item ) {
@@ -139,9 +145,6 @@ class FAC_Admin_Settings {
         add_action( 'admin_post_fac_delete_filter', [ $this, 'delete_filter' ] );
         add_action( 'admin_notices', [ $this, 'admin_notices' ] );
         add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_scripts' ] );
-        
-        // AJAX pentru a obține datele filtrului
-        add_action( 'wp_ajax_fac_get_filter_data', [ $this, 'ajax_get_filter_data' ] );
     }
 
     public function enqueue_admin_scripts( $hook ) {
@@ -178,8 +181,27 @@ class FAC_Admin_Settings {
                 // Populează formularul cu datele existente
                 $('#fac-edit-index').val(index);
                 $('#edit_filter_label').val(label);
-                $('#edit_filter_taxonomy').val(taxonomy);
                 $('#edit_filter_type').val(type);
+                
+                // Verifică dacă taxonomia există în select
+                var $taxonomySelect = $('#edit_filter_taxonomy');
+                var $customTaxonomy = $('#edit_custom_taxonomy');
+                
+                if ($taxonomySelect.find('option[value="' + taxonomy + '"]').length > 0) {
+                    // Taxonomia există în select
+                    $taxonomySelect.val(taxonomy);
+                    $customTaxonomy.val('');
+                    $('#edit_taxonomy_type').val('existing');
+                    $('#edit_existing_taxonomy_section').show();
+                    $('#edit_custom_taxonomy_section').hide();
+                } else {
+                    // Taxonomia este custom
+                    $taxonomySelect.val('custom');
+                    $customTaxonomy.val(taxonomy);
+                    $('#edit_taxonomy_type').val('custom');
+                    $('#edit_existing_taxonomy_section').hide();
+                    $('#edit_custom_taxonomy_section').show();
+                }
                 
                 // Afișează modal-ul
                 $('#fac-edit-modal').show();
@@ -197,29 +219,73 @@ class FAC_Admin_Settings {
                 $('#fac-instructions-modal').show();
             });
 
+            // Toggle între taxonomie existentă și custom - ADD
+            $('#taxonomy_type').on('change', function() {
+                if ($(this).val() === 'custom') {
+                    $('#existing_taxonomy_section').hide();
+                    $('#custom_taxonomy_section').show();
+                } else {
+                    $('#existing_taxonomy_section').show();
+                    $('#custom_taxonomy_section').hide();
+                }
+            });
+
+            // Toggle între taxonomie existentă și custom - EDIT
+            $('#edit_taxonomy_type').on('change', function() {
+                if ($(this).val() === 'custom') {
+                    $('#edit_existing_taxonomy_section').hide();
+                    $('#edit_custom_taxonomy_section').show();
+                } else {
+                    $('#edit_existing_taxonomy_section').show();
+                    $('#edit_custom_taxonomy_section').hide();
+                }
+            });
+
             // Reset formular adăugare la închidere
             $('#fac-add-modal .fac-modal-close, #fac-add-modal .fac-modal-cancel').on('click', function() {
                 $('#fac-add-modal form')[0].reset();
+                $('#existing_taxonomy_section').show();
+                $('#custom_taxonomy_section').hide();
+            });
+
+            // Validare formular - ADD
+            $('#fac-add-modal form').on('submit', function(e) {
+                var taxonomyType = $('#taxonomy_type').val();
+                var taxonomyValue = '';
+                
+                if (taxonomyType === 'existing') {
+                    taxonomyValue = $('#filter_taxonomy').val();
+                } else {
+                    taxonomyValue = $('#custom_taxonomy').val().trim();
+                }
+                
+                if (!taxonomyValue) {
+                    e.preventDefault();
+                    alert('Vă rugăm să selectați sau să introduceți o taxonomie.');
+                    return false;
+                }
+            });
+
+            // Validare formular - EDIT
+            $('#fac-edit-modal form').on('submit', function(e) {
+                var taxonomyType = $('#edit_taxonomy_type').val();
+                var taxonomyValue = '';
+                
+                if (taxonomyType === 'existing') {
+                    taxonomyValue = $('#edit_filter_taxonomy').val();
+                } else {
+                    taxonomyValue = $('#edit_custom_taxonomy').val().trim();
+                }
+                
+                if (!taxonomyValue) {
+                    e.preventDefault();
+                    alert('Vă rugăm să selectați sau să introduceți o taxonomie.');
+                    return false;
+                }
             });
         });
         </script>
         <?php
-    }
-
-    public function ajax_get_filter_data() {
-        // Verifică nonce și permisiuni
-        if ( ! check_ajax_referer( 'fac_edit_filter', 'nonce', false ) || ! current_user_can( 'manage_options' ) ) {
-            wp_die( 'Permisiune refuzată.' );
-        }
-
-        $index = intval( $_POST['index'] );
-        $saved_filters = get_option( $this->filters_option, [] );
-
-        if ( isset( $saved_filters[ $index ] ) ) {
-            wp_send_json_success( $saved_filters[ $index ] );
-        } else {
-            wp_send_json_error( 'Filtru negăsit.' );
-        }
     }
 
     public function add_settings_page() {
@@ -280,9 +346,18 @@ class FAC_Admin_Settings {
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th scope="row"><label for="filter_taxonomy">Taxonomie:</label></th>
+                                    <th scope="row"><label for="taxonomy_type">Tip taxonomie:</label></th>
                                     <td>
-                                        <select id="filter_taxonomy" name="filter_taxonomy" class="regular-text" required>
+                                        <select id="taxonomy_type" name="taxonomy_type" class="regular-text" required>
+                                            <option value="existing">Selectează din taxonomiile existente</option>
+                                            <option value="custom">Introdu taxonomie custom</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr id="existing_taxonomy_section">
+                                    <th scope="row"><label for="filter_taxonomy">Taxonomie existentă:</label></th>
+                                    <td>
+                                        <select id="filter_taxonomy" name="filter_taxonomy" class="regular-text">
                                             <option value="">-- Alege taxonomia --</option>
                                             <?php foreach ( $taxonomies as $taxonomy ) : ?>
                                                 <option value="<?php echo esc_attr( $taxonomy->name ); ?>">
@@ -290,7 +365,14 @@ class FAC_Admin_Settings {
                                                 </option>
                                             <?php endforeach; ?>
                                         </select>
-                                        <p class="description">Taxonomia WooCommerce</p>
+                                        <p class="description">Alege dintre taxonomiile WooCommerce existente</p>
+                                    </td>
+                                </tr>
+                                <tr id="custom_taxonomy_section" style="display: none;">
+                                    <th scope="row"><label for="custom_taxonomy">Taxonomie custom:</label></th>
+                                    <td>
+                                        <input type="text" id="custom_taxonomy" name="custom_taxonomy" class="regular-text" placeholder="ex: custom_taxonomy">
+                                        <p class="description">Introdu slug-ul taxonomiei custom</p>
                                     </td>
                                 </tr>
                                 <tr>
@@ -335,9 +417,18 @@ class FAC_Admin_Settings {
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th scope="row"><label for="edit_filter_taxonomy">Taxonomie:</label></th>
+                                    <th scope="row"><label for="edit_taxonomy_type">Tip taxonomie:</label></th>
                                     <td>
-                                        <select id="edit_filter_taxonomy" name="filter_taxonomy" class="regular-text" required>
+                                        <select id="edit_taxonomy_type" name="taxonomy_type" class="regular-text" required>
+                                            <option value="existing">Selectează din taxonomiile existente</option>
+                                            <option value="custom">Introdu taxonomie custom</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr id="edit_existing_taxonomy_section">
+                                    <th scope="row"><label for="edit_filter_taxonomy">Taxonomie existentă:</label></th>
+                                    <td>
+                                        <select id="edit_filter_taxonomy" name="filter_taxonomy" class="regular-text">
                                             <option value="">-- Alege taxonomia --</option>
                                             <?php foreach ( $taxonomies as $taxonomy ) : ?>
                                                 <option value="<?php echo esc_attr( $taxonomy->name ); ?>">
@@ -345,6 +436,12 @@ class FAC_Admin_Settings {
                                                 </option>
                                             <?php endforeach; ?>
                                         </select>
+                                    </td>
+                                </tr>
+                                <tr id="edit_custom_taxonomy_section" style="display: none;">
+                                    <th scope="row"><label for="edit_custom_taxonomy">Taxonomie custom:</label></th>
+                                    <td>
+                                        <input type="text" id="edit_custom_taxonomy" name="custom_taxonomy" class="regular-text" placeholder="ex: custom_taxonomy">
                                     </td>
                                 </tr>
                                 <tr>
@@ -378,11 +475,11 @@ class FAC_Admin_Settings {
                     <div class="fac-modal-body">
                         <ol>
                             <li><strong>Configurează filtrele</strong> în această pagină folosind butonul "Adaugă Filtru Nou"</li>
+                            <li><strong>Tip taxonomie:</strong> Poți alege dintre taxonomiile existente sau introduce una custom</li>
+                            <li><strong>Taxonomii custom:</strong> Introdu slug-ul taxonomiei tale custom (ex: custom_size, location, etc.)</li>
                             <li><strong>Mergi la Apariție → Widgets</strong> și adaugă widget-ul "FAC - Filter" în sidebar-ul shop-ului</li>
                             <li><strong>În widget</strong>, selectează filtru din lista celor configurate aici</li>
                             <li><strong>Filtrele active</strong> vor apărea automat în secțiunea "Filtre active" WooCommerce</li>
-                            <li><strong>Pentru editare</strong>, folosește linkul "Editare" din lista de filtre</li>
-                            <li><strong>Pentru ștergere în masă</strong>, selectează filtrele și folosește acțiunea bulk</li>
                         </ol>
                     </div>
                     <div class="fac-modal-footer">
@@ -468,6 +565,22 @@ class FAC_Admin_Settings {
         .wp-list-table .column-type { width: 20%; }
         .wp-list-table .column-actions { width: 15%; }
         .wp-list-table .column-cb { width: 5%; }
+
+        /* Stiluri pentru status taxonomii */
+        .taxonomy-status {
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-left: 5px;
+        }
+        .taxonomy-exists {
+            background: #46b450;
+            color: white;
+        }
+        .taxonomy-custom {
+            background: #dc3232;
+            color: white;
+        }
         </style>
         <?php
     }
@@ -494,9 +607,23 @@ class FAC_Admin_Settings {
 
         $saved_filters = get_option( $this->filters_option, [] );
         
+        // Determină valoarea taxonomiei
+        $taxonomy_type = sanitize_text_field( $_POST['taxonomy_type'] );
+        $taxonomy_value = '';
+        
+        if ( $taxonomy_type === 'existing' ) {
+            $taxonomy_value = sanitize_text_field( $_POST['filter_taxonomy'] );
+        } else {
+            $taxonomy_value = sanitize_text_field( $_POST['custom_taxonomy'] );
+        }
+        
+        if ( empty( $taxonomy_value ) ) {
+            wp_die( 'Taxonomia este obligatorie.' );
+        }
+
         $new_filter = [
             'label'    => sanitize_text_field( $_POST['filter_label'] ),
-            'taxonomy' => sanitize_text_field( $_POST['filter_taxonomy'] ),
+            'taxonomy' => $taxonomy_value,
             'type'     => sanitize_text_field( $_POST['filter_type'] )
         ];
 
@@ -516,10 +643,24 @@ class FAC_Admin_Settings {
 
         $saved_filters = get_option( $this->filters_option, [] );
 
+        // Determină valoarea taxonomiei
+        $taxonomy_type = sanitize_text_field( $_POST['taxonomy_type'] );
+        $taxonomy_value = '';
+        
+        if ( $taxonomy_type === 'existing' ) {
+            $taxonomy_value = sanitize_text_field( $_POST['filter_taxonomy'] );
+        } else {
+            $taxonomy_value = sanitize_text_field( $_POST['custom_taxonomy'] );
+        }
+        
+        if ( empty( $taxonomy_value ) ) {
+            wp_die( 'Taxonomia este obligatorie.' );
+        }
+
         if ( isset( $saved_filters[ $index ] ) ) {
             $saved_filters[ $index ] = [
                 'label'    => sanitize_text_field( $_POST['filter_label'] ),
-                'taxonomy' => sanitize_text_field( $_POST['filter_taxonomy'] ),
+                'taxonomy' => $taxonomy_value,
                 'type'     => sanitize_text_field( $_POST['filter_type'] )
             ];
 
