@@ -50,20 +50,21 @@ class FAC_Filter_Widget extends WP_Widget {
 
         // Obține termenii curenti din URL
         $current_terms = $this->get_current_filter_terms( $taxonomy );
+        $has_active_filters = ! empty( $current_terms );
 
         echo '<div class="fac-filter fac-filter-' . esc_attr( $type ) . '" data-taxonomy="' . esc_attr( $taxonomy ) . '">';
         
         switch ( $type ) {
             case 'checkbox':
-                $this->render_checkbox_filter( $taxonomy, $terms, $current_terms );
+                $this->render_checkbox_filter( $taxonomy, $terms, $current_terms, $has_active_filters );
                 break;
 
             case 'select':
-                $this->render_select_filter( $taxonomy, $terms, $current_terms, false );
+                $this->render_select_filter( $taxonomy, $terms, $current_terms, $has_active_filters, false );
                 break;
 
             case 'multiselect':
-                $this->render_select_filter( $taxonomy, $terms, $current_terms, true );
+                $this->render_select_filter( $taxonomy, $terms, $current_terms, $has_active_filters, true );
                 break;
         }
 
@@ -91,75 +92,85 @@ class FAC_Filter_Widget extends WP_Widget {
         return [];
     }
 
-private function render_checkbox_filter( $taxonomy, $terms, $current_terms ) {
-    echo '<form method="get" action="" class="fac-filter-form" id="fac-form-' . esc_attr( $taxonomy ) . '">';
-    
-    // Păstrează toți parametrii existenți (except filtrele curente și paginarea)
-    foreach ( $_GET as $key => $value ) {
-        if ( $key !== 'filter_' . $taxonomy && $key !== 'paged' ) {
-            if ( is_array( $value ) ) {
-                foreach ( $value as $val ) {
-                    echo '<input type="hidden" name="' . esc_attr( $key ) . '[]" value="' . esc_attr( $val ) . '">';
+    private function render_checkbox_filter( $taxonomy, $terms, $current_terms, $has_active_filters ) {
+        $clear_url = $this->get_clear_filter_url( $taxonomy );
+        
+        echo '<form method="get" action="" class="fac-filter-form" id="fac-form-' . esc_attr( $taxonomy ) . '">';
+        
+        // Păstrează toți parametrii existenți (except filtrele curente și paginarea)
+        foreach ( $_GET as $key => $value ) {
+            if ( $key !== 'filter_' . $taxonomy && $key !== 'paged' ) {
+                if ( is_array( $value ) ) {
+                    foreach ( $value as $val ) {
+                        echo '<input type="hidden" name="' . esc_attr( $key ) . '[]" value="' . esc_attr( $val ) . '">';
+                    }
+                } else {
+                    echo '<input type="hidden" name="' . esc_attr( $key ) . '" value="' . esc_attr( $value ) . '">';
                 }
-            } else {
-                echo '<input type="hidden" name="' . esc_attr( $key ) . '" value="' . esc_attr( $value ) . '">';
             }
         }
-    }
 
-    // Input hidden care va conține toate termenii selectate (ca string cu virgulă)
-    echo '<input type="hidden" name="filter_' . esc_attr( $taxonomy ) . '" id="fac-hidden-' . esc_attr( $taxonomy ) . '" value="' . esc_attr( implode( ',', $current_terms ) ) . '">';
+        // Input hidden care va conține toate termenii selectate (ca string cu virgulă)
+        echo '<input type="hidden" name="filter_' . esc_attr( $taxonomy ) . '" id="fac-hidden-' . esc_attr( $taxonomy ) . '" value="' . esc_attr( implode( ',', $current_terms ) ) . '">';
 
-    foreach ( $terms as $term ) {
-        $checked = in_array( $term->slug, $current_terms ) ? 'checked' : '';
-        $disabled = ( $term->count === 0 ) ? 'disabled' : '';
+        foreach ( $terms as $term ) {
+            $checked = in_array( $term->slug, $current_terms ) ? 'checked' : '';
+            $disabled = ( $term->count === 0 ) ? 'disabled' : '';
+            
+            echo '<label class="fac-filter-label ' . $disabled . '">';
+            echo '<input type="checkbox" value="' . esc_attr( $term->slug ) . '" ' . $checked . ' ' . $disabled . ' class="fac-checkbox">';
+            echo '<span class="fac-filter-text">';
+            echo '<span class="fac-filter-name">' . esc_html( $term->name ) . '</span>';
+            echo '<span class="fac-filter-count">' . $term->count . '</span>';
+            echo '</span>';
+            echo '</label>';
+        }
+
+        echo '<div class="fac-filter-buttons">';
+        echo '<button type="submit" class="fac-filter-btn fac-apply-btn">Aplică Filtre</button>';
         
-        echo '<label class="fac-filter-label ' . $disabled . '">';
-        echo '<input type="checkbox" value="' . esc_attr( $term->slug ) . '" ' . $checked . ' ' . $disabled . ' class="fac-checkbox">';
-        echo '<span class="fac-filter-text">';
-        echo '<span class="fac-filter-name">' . esc_html( $term->name ) . '</span>';
-        echo '<span class="fac-filter-count">' . $term->count . '</span>';
-        echo '</span>';
-        echo '</label>';
-    }
-
-    echo '<button type="submit" class="fac-filter-btn">Aplică Filtre</button>';
-    echo '</form>';
-
-    // JavaScript pentru a gestiona checkbox-urile și a construi string-ul cu virgulă
-    echo '
-    <script>
-    jQuery(document).ready(function($) {
-        var form = $("#fac-form-' . esc_attr( $taxonomy ) . '");
-        var hiddenInput = $("#fac-hidden-' . esc_attr( $taxonomy ) . '");
-        var checkboxes = form.find(".fac-checkbox");
+        if ( $has_active_filters ) {
+            echo '<a href="' . esc_url( $clear_url ) . '" class="fac-filter-btn fac-clear-btn">Șterge Filtru</a>';
+        }
+        echo '</div>';
         
-        checkboxes.on("change", function() {
-            var selectedValues = [];
-            checkboxes.each(function() {
-                if ($(this).is(":checked") && !$(this).is(":disabled")) {
-                    selectedValues.push($(this).val());
+        echo '</form>';
+
+        // JavaScript pentru a gestiona checkbox-urile și a construi string-ul cu virgulă
+        echo '
+        <script>
+        jQuery(document).ready(function($) {
+            var form = $("#fac-form-' . esc_attr( $taxonomy ) . '");
+            var hiddenInput = $("#fac-hidden-' . esc_attr( $taxonomy ) . '");
+            var checkboxes = form.find(".fac-checkbox");
+            
+            checkboxes.on("change", function() {
+                var selectedValues = [];
+                checkboxes.each(function() {
+                    if ($(this).is(":checked") && !$(this).is(":disabled")) {
+                        selectedValues.push($(this).val());
+                    }
+                });
+                hiddenInput.val(selectedValues.join(","));
+            });
+            
+            // Previne submit-ul dacă nu sunt schimbări
+            form.on("submit", function(e) {
+                var currentValue = hiddenInput.val();
+                var originalValue = "' . esc_attr( implode( ',', $current_terms ) ) . '";
+                if (currentValue === originalValue) {
+                    e.preventDefault();
                 }
             });
-            hiddenInput.val(selectedValues.join(","));
         });
-        
-        // Previne submit-ul dacă nu sunt schimbări
-        form.on("submit", function(e) {
-            var currentValue = hiddenInput.val();
-            var originalValue = "' . esc_attr( implode( ',', $current_terms ) ) . '";
-            if (currentValue === originalValue) {
-                e.preventDefault();
-            }
-        });
-    });
-    </script>
-    ';
-}
+        </script>
+        ';
+    }
 
-    private function render_select_filter( $taxonomy, $terms, $current_terms, $multiple = false ) {
+    private function render_select_filter( $taxonomy, $terms, $current_terms, $has_active_filters, $multiple = false ) {
         $select_name = 'filter_' . $taxonomy;
         $current_value = implode( ',', $current_terms );
+        $clear_url = $this->get_clear_filter_url( $taxonomy );
         
         echo '<form method="get" action="" class="fac-filter-form">';
         
@@ -187,7 +198,14 @@ private function render_checkbox_filter( $taxonomy, $terms, $current_terms ) {
                 echo '</option>';
             }
             echo '</select>';
-            echo '<button type="submit" class="fac-filter-btn">Aplică</button>';
+            
+            echo '<div class="fac-filter-buttons">';
+            echo '<button type="submit" class="fac-filter-btn fac-apply-btn">Aplică</button>';
+            
+            if ( $has_active_filters ) {
+                echo '<a href="' . esc_url( $clear_url ) . '" class="fac-filter-btn fac-clear-btn">Șterge Filtru</a>';
+            }
+            echo '</div>';
         } else {
             echo '<select name="' . esc_attr( $select_name ) . '" class="fac-select" onchange="this.form.submit()">';
             echo '<option value="">-- Alege --</option>';
@@ -200,9 +218,23 @@ private function render_checkbox_filter( $taxonomy, $terms, $current_terms ) {
                 echo '</option>';
             }
             echo '</select>';
+            
+            // Pentru select simplu, afișăm butonul de ștergere doar dacă există filtru activ
+            if ( $has_active_filters ) {
+                echo '<div class="fac-filter-buttons">';
+                echo '<a href="' . esc_url( $clear_url ) . '" class="fac-filter-btn fac-clear-btn" style="margin-top: 10px;">Șterge Filtru</a>';
+                echo '</div>';
+            }
         }
 
         echo '</form>';
+    }
+
+    /**
+     * Obține URL-ul pentru ștergerea filtrului curent
+     */
+    private function get_clear_filter_url( $taxonomy ) {
+        return remove_query_arg( [ 'filter_' . $taxonomy, 'paged' ] );
     }
 
     private function get_terms_with_count( $taxonomy ) {
