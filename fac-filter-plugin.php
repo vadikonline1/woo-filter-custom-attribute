@@ -4,9 +4,9 @@
  * Description: Un plugin de filtrare WooCommerce după taxonomii/atribute personalizate.
  * Version: 1.0
  * Author: Steel..xD
- * Plugin URI: https://github.com/vadikonline1/
- * Author URI: https://github.com/vadikonline1/
- * GitHub Plugin URI: https://github.com/vadikonline1/
+ * Plugin URI: https://github.com/vadikonline1/woo-filter-custom-attribute/
+ * Author URI: https://github.com/vadikonline1/woo-filter-custom-attribute/
+ * GitHub Plugin URI: https://github.com/vadikonline1/woo-filter-custom-attribute/
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -226,4 +226,5 @@ function fac_enqueue_woocommerce_styles() {
         }
     }
 }
+
 add_action( 'wp_enqueue_scripts', 'fac_enqueue_woocommerce_styles' );
