@@ -877,10 +877,6 @@ jQuery(document).ready(function($) {
         exit;
     }
 
-    public function admin_notices() {
-        // Folosim display_admin_notices() în loc de aceasta
-    }
-
     private function get_available_taxonomies() {
         $taxonomies = get_taxonomies( [
             'object_type' => [ 'product' ]
