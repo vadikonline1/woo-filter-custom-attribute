@@ -888,6 +888,10 @@ jQuery(document).ready(function($) {
     public static function get_saved_filters() {
         return get_option( 'fac_saved_filters', [] );
     }
+    public function admin_notices() {
+        // Folosim display_admin_notices() în loc de aceasta
+    }
+
 }
 
 new FAC_Admin_Settings();
