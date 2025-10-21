@@ -472,13 +472,13 @@ class FAC_Admin_Settings {
 
 <!-- Modal pentru instrucțiuni -->
 <div id="fac-instructions-modal" class="fac-modal" style="display: none;">
-    <div class="fac-modal-content" style="max-width: 700px;">
+    <div class="fac-modal-content" style="max-width: 800px;">
         <div class="fac-modal-header">
             <h2>Instrucțiuni FAC Filter</h2>
             <span class="fac-modal-close">&times;</span>
         </div>
         <div class="fac-modal-body">
-            <h3>Configurare si Adăugarea Widget-urilor</h3>
+            <h3>Configurare și Adăugarea Widget-urilor</h3>
             <ol>
                 <li><strong>Configurează filtrele</strong> în această pagină folosind butonul "Adaugă Filtru Nou"</li>
                 <li><strong>Tip taxonomie:</strong> Poți alege dintre taxonomiile existente sau introduce una custom</li>
@@ -493,50 +493,133 @@ class FAC_Admin_Settings {
             
             <div class="fac-shortcode-examples">
                 <div class="fac-shortcode-item">
-                    <label>Meniu orizontal:</label>
+                    <label>Shortcode default (fără setări):</label>
                     <div class="fac-code-block">
-                        <code>[fac-menu fac-position="orizontal" fac-filter-id="0,1,2"]</code>
-                        <button type="button" class="fac-copy-btn" data-code='[fac-menu fac-position="orizontal" fac-filter-id="0,1,2"]'>
-                            Copiază
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="fac-shortcode-item">
-                    <label>Meniu vertical:</label>
-                    <div class="fac-code-block">
-                        <code>[fac-menu fac-position="vertical" fac-filter-id="0,1"]</code>
-                        <button type="button" class="fac-copy-btn" data-code='[fac-menu fac-position="vertical" fac-filter-id="0,1"]'>
-                            Copiază
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="fac-shortcode-item">
-                    <label>Cu clasă custom:</label>
-                    <div class="fac-code-block">
-                        <code>[fac-menu fac-position="orizontal" fac-filter-id="0,1,2" fac-class="my-custom-menu"]</code>
-                        <button type="button" class="fac-copy-btn" data-code='[fac-menu fac-position="orizontal" fac-filter-id="0,1,2" fac-class="my-custom-menu"]'>
-                            Copiază
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="fac-shortcode-item">
-                    <label>Un singur filtru:</label>
-                    <div class="fac-code-block">
-                        <code>[fac-menu fac-filter-id="0"]</code>
-                        <button type="button" class="fac-copy-btn" data-code='[fac-menu fac-filter-id="0"]'>
+                        <code>[fac-menu]</code>
+                        <button type="button" class="fac-copy-btn" data-code='[fac-menu]'>
                             Copiază
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div class="fac-shortcode-info">
-                <h4>Cum să folosești ID-urile filtrelor:</h4>
-                <p>Înlocuiește <code>0,1,2</code> cu ID-urile filtrelor tale din tabelul de mai sus.</p>
-                <p>Exemplu: Dacă ai filtrele cu ID-urile 0, 1 și 3, folosește: <code>[fac-menu fac-filter-id="0,1,3"]</code></p>
+            <div class="fac-parameters-info">
+                <h4>Parametrii shortcode-ului:</h4>
+                
+                <div class="fac-parameter-item">
+                    <h5>Parametru <code>fac-filter-id</code>:</h5>
+                    <p>ID-urile pot fi câte unul sau mai multe separate prin virgulă.</p>
+                    <div class="fac-code-examples">
+                        <div class="fac-code-example">
+                            <label>Un singur filtru:</label>
+                            <div class="fac-code-block">
+                                <code>[fac-menu fac-filter-id="0"]</code>
+                                <button type="button" class="fac-copy-btn" data-code='[fac-menu fac-filter-id="0"]'>
+                                    Copiază
+                                </button>
+                            </div>
+                        </div>
+                        <div class="fac-code-example">
+                            <label>Mai multe filtre:</label>
+                            <div class="fac-code-block">
+                                <code>[fac-menu fac-filter-id="0,1,3"]</code>
+                                <button type="button" class="fac-copy-btn" data-code='[fac-menu fac-filter-id="0,1,3"]'>
+                                    Copiază
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fac-parameter-item">
+                    <h5>Parametru <code>fac-position</code>:</h5>
+                    <p>Poziția meniului de filtrare.</p>
+                    <div class="fac-code-examples">
+                        <div class="fac-code-example">
+                            <label>Orizontal:</label>
+                            <div class="fac-code-block">
+                                <code>[fac-menu fac-position="orizontal"]</code>
+                                <button type="button" class="fac-copy-btn" data-code='[fac-menu fac-position="orizontal"]'>
+                                    Copiază
+                                </button>
+                            </div>
+                        </div>
+                        <div class="fac-code-example">
+                            <label>Vertical:</label>
+                            <div class="fac-code-block">
+                                <code>[fac-menu fac-position="vertical"]</code>
+                                <button type="button" class="fac-copy-btn" data-code='[fac-menu fac-position="vertical"]'>
+                                    Copiază
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fac-parameter-item">
+                    <h5>Parametru <code>fac-class</code>:</h5>
+                    <p>Adaugă o clasă CSS personalizată pentru stilizare.</p>
+                    <div class="fac-code-examples">
+                        <div class="fac-code-example">
+                            <div class="fac-code-block">
+                                <code>[fac-menu fac-class="my-custom-menu"]</code>
+                                <button type="button" class="fac-copy-btn" data-code='[fac-menu fac-class="my-custom-menu"]'>
+                                    Copiază
+                                </button>
+                            </div>
+                            <p class="fac-parameter-description">Implementează CSS-ul tău personal pentru stilizare avansată</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fac-parameter-item">
+                    <h5>Parametru <code>count</code>:</h5>
+                    <p>Controlează afișarea counter-ului pentru numărul de produse.</p>
+                    <div class="fac-code-examples">
+                        <div class="fac-code-example">
+                            <label>Cu counter (implicit):</label>
+                            <div class="fac-code-block">
+                                <code>[fac-menu count="1"]</code>
+                                <button type="button" class="fac-copy-btn" data-code='[fac-menu count="1"]'>
+                                    Copiază
+                                </button>
+                            </div>
+                        </div>
+                        <div class="fac-code-example">
+                            <label>Fără counter:</label>
+                            <div class="fac-code-block">
+                                <code>[fac-menu count="0"]</code>
+                                <button type="button" class="fac-copy-btn" data-code='[fac-menu count="0"]'>
+                                    Copiază
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fac-parameter-item">
+                    <h5>Exemple combinate:</h5>
+                    <div class="fac-code-examples">
+                        <div class="fac-code-example">
+                            <label>Meniu orizontal cu counter:</label>
+                            <div class="fac-code-block">
+                                <code>[fac-menu fac-position="orizontal" fac-filter-id="0,1,2" count="1"]</code>
+                                <button type="button" class="fac-copy-btn" data-code='[fac-menu fac-position="orizontal" fac-filter-id="0,1,2" count="1"]'>
+                                    Copiază
+                                </button>
+                            </div>
+                        </div>
+                        <div class="fac-code-example">
+                            <label>Meniu vertical fără counter:</label>
+                            <div class="fac-code-block">
+                                <code>[fac-menu fac-position="vertical" fac-filter-id="0,1" count="0"]</code>
+                                <button type="button" class="fac-copy-btn" data-code='[fac-menu fac-position="vertical" fac-filter-id="0,1" count="0"]'>
+                                    Copiază
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="fac-modal-footer">
@@ -544,6 +627,223 @@ class FAC_Admin_Settings {
         </div>
     </div>
 </div>
+
+<style>
+.fac-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.fac-modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 0;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    width: 800px;
+    max-width: 90%;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.fac-modal-header {
+    background: #f8f9fa;
+    padding: 20px;
+    border-bottom: 1px solid #e5e5e5;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.fac-modal-header h2 {
+    margin: 0;
+    font-size: 1.3em;
+}
+
+.fac-modal-close {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.fac-modal-close:hover {
+    color: #000;
+}
+
+.fac-modal-body {
+    padding: 20px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.fac-modal-footer {
+    padding: 20px;
+    border-top: 1px solid #e5e5e5;
+    background: #f8f9fa;
+    text-align: right;
+}
+
+.fac-modal-footer .button {
+    margin-left: 10px;
+}
+
+/* Stiluri pentru shortcode examples */
+.fac-shortcode-examples {
+    margin: 20px 0;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.fac-shortcode-item {
+    padding: 15px;
+    border-bottom: 1px solid #f0f0f0;
+    background: #fafafa;
+}
+
+.fac-shortcode-item:last-child {
+    border-bottom: none;
+}
+
+.fac-shortcode-item label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+}
+
+/* Stiluri pentru parametri */
+.fac-parameters-info {
+    margin-top: 30px;
+}
+
+.fac-parameters-info h4 {
+    color: #007cba;
+    border-bottom: 2px solid #007cba;
+    padding-bottom: 8px;
+    margin-bottom: 20px;
+}
+
+.fac-parameter-item {
+    margin-bottom: 25px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 4px solid #007cba;
+}
+
+.fac-parameter-item h5 {
+    margin: 0 0 10px 0;
+    color: #333;
+    font-size: 15px;
+}
+
+.fac-parameter-item h5 code {
+    background: #e7f3ff;
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: #007cba;
+}
+
+.fac-code-examples {
+    margin-top: 10px;
+}
+
+.fac-code-example {
+    margin-bottom: 15px;
+}
+
+.fac-code-example:last-child {
+    margin-bottom: 0;
+}
+
+.fac-code-example label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #555;
+    font-size: 13px;
+}
+
+.fac-code-block {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: white;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    margin-bottom: 5px;
+}
+
+.fac-code-block code {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 0;
+    color: #333;
+    font-size: 12px;
+    line-height: 1.4;
+    word-break: break-all;
+}
+
+.fac-copy-btn {
+    background: #007cba;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.fac-copy-btn:hover {
+    background: #005a87;
+    transform: translateY(-1px);
+}
+
+.fac-copy-btn.copied {
+    background: #46b450;
+}
+
+.fac-parameter-description {
+    font-size: 12px;
+    color: #666;
+    margin: 5px 0 0 0;
+    font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .fac-modal-content {
+        width: 95%;
+        margin: 10% auto;
+    }
+    
+    .fac-code-block {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+    
+    .fac-copy-btn {
+        align-self: flex-end;
+    }
+}
+</style>
 
 <script>
 jQuery(document).ready(function($) {
@@ -579,196 +879,6 @@ jQuery(document).ready(function($) {
     });
 });
 </script>
-
-        <style>
-        .fac-modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-        }
-
-        .fac-modal-content {
-            background-color: #fefefe;
-            margin: 5% auto;
-            padding: 0;
-            border: 1px solid #ccd0d4;
-            border-radius: 4px;
-            width: 700px;
-            max-width: 90%;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        .fac-modal-header {
-            background: #f8f9fa;
-            padding: 20px;
-            border-bottom: 1px solid #e5e5e5;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .fac-modal-header h2 {
-            margin: 0;
-            font-size: 1.3em;
-        }
-
-        .fac-modal-close {
-            color: #aaa;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            line-height: 1;
-        }
-
-        .fac-modal-close:hover {
-            color: #000;
-        }
-
-        .fac-modal-body {
-            padding: 20px;
-            max-height: 60vh;
-            overflow-y: auto;
-        }
-
-        .fac-modal-footer {
-            padding: 20px;
-            border-top: 1px solid #e5e5e5;
-            background: #f8f9fa;
-            text-align: right;
-        }
-
-        .fac-modal-footer .button {
-            margin-left: 10px;
-        }
-
-        .wrap h1 {
-            margin-bottom: 20px;
-        }
-
-        /* Stiluri pentru rândurile tabelului */
-        .wp-list-table .column-label { width: 25%; }
-        .wp-list-table .column-taxonomy { width: 25%; }
-        .wp-list-table .column-type { width: 20%; }
-        .wp-list-table .column-actions { width: 15%; }
-        .wp-list-table .column-cb { width: 5%; }
-
-        /* Stiluri pentru status taxonomii */
-        .taxonomy-status {
-            font-size: 12px;
-            padding: 2px 6px;
-            border-radius: 3px;
-            margin-left: 5px;
-        }
-        .taxonomy-exists {
-            background: #46b450;
-            color: white;
-        }
-        .taxonomy-custom {
-            background: #dc3232;
-            color: white;
-        }
-        
-        
-        /* Stiluri pentru Instructiunii */
-        .fac-shortcode-examples {
-            margin: 20px 0;
-            border: 1px solid #e5e5e5;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        
-        .fac-shortcode-item {
-            padding: 15px;
-            border-bottom: 1px solid #f0f0f0;
-            background: #fafafa;
-        }
-        
-        .fac-shortcode-item:last-child {
-            border-bottom: none;
-        }
-        
-        .fac-shortcode-item label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-            font-size: 14px;
-        }
-        
-        .fac-code-block {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: white;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-        }
-        
-        .fac-code-block code {
-            flex: 1;
-            background: none;
-            border: none;
-            padding: 0;
-            color: #333;
-            font-size: 13px;
-            line-height: 1.4;
-        }
-        
-        .fac-copy-btn {
-            background: #007cba;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-        }
-        
-        .fac-copy-btn:hover {
-            background: #005a87;
-            transform: translateY(-1px);
-        }
-        
-        .fac-copy-btn.copied {
-            background: #46b450;
-        }
-        
-        .fac-shortcode-info {
-            background: #e7f3ff;
-            padding: 15px;
-            border-radius: 6px;
-            margin-top: 20px;
-            border-left: 4px solid #007cba;
-        }
-        
-        .fac-shortcode-info h4 {
-            margin: 0 0 10px 0;
-            color: #007cba;
-        }
-        
-        .fac-shortcode-info p {
-            margin: 5px 0;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-        
-        .fac-shortcode-info code {
-            background: #f1f1f1;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 12px;
-        }
-        </style>
         <?php
     }
 

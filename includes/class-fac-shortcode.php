@@ -13,10 +13,16 @@ class FAC_Shortcode {
         $atts = shortcode_atts( [
             'fac-position'  => 'orizontal',
             'fac-filter-id' => '',
-            'fac-class'     => ''
+            'fac-class'     => '',
+            'count'         => '1'
         ], $atts, 'fac-menu' );
 
-        $filter_ids = array_filter( array_map( 'trim', explode( ',', $atts['fac-filter-id'] ) ) );
+        $filter_ids = array_map( 'trim', explode( ',', $atts['fac-filter-id'] ) );
+        
+        // CORECTARE: Verificare corectă pentru toate ID-urile, inclusiv 0
+        $filter_ids = array_filter( $filter_ids, function( $id ) {
+            return $id !== '';
+        });
         
         if ( empty( $filter_ids ) ) {
             return '<p>Nu există filtre configurate pentru acest meniu.</p>';
@@ -26,13 +32,17 @@ class FAC_Shortcode {
         $available_filters = [];
 
         foreach ( $filter_ids as $filter_id ) {
+            // CORECTARE: Verificare explicită pentru toate index-uri, inclusiv 0
             if ( isset( $saved_filters[ $filter_id ] ) ) {
                 $available_filters[ $filter_id ] = $saved_filters[ $filter_id ];
+            } else {
+                // Debug: afișează ce ID-uri nu sunt găsite
+                error_log( "FAC Filter: ID {$filter_id} nu a fost găsit în filtrele salvate." );
             }
         }
 
         if ( empty( $available_filters ) ) {
-            return '<p>Nu există filtre configurate pentru acest meniu.</p>';
+            return '<p>Nu există filtre configurate pentru acest meniu. ID-uri solicitate: ' . esc_html( $atts['fac-filter-id'] ) . '</p>';
         }
 
         // Marchează că scripturile trebuie încărcate
@@ -40,6 +50,7 @@ class FAC_Shortcode {
 
         $position_class = ( $atts['fac-position'] === 'vertical' ) ? 'fac-menu-vertical' : 'fac-menu-horizontal';
         $custom_class = ! empty( $atts['fac-class'] ) ? sanitize_html_class( $atts['fac-class'] ) : '';
+        $show_count = $atts['count'] === '1'; // Convertim în boolean
 
         ob_start();
         ?>
@@ -47,7 +58,7 @@ class FAC_Shortcode {
             <form method="get" action="<?php echo esc_url( $this->get_shop_url() ); ?>" class="fac-menu-form" id="fac-menu-form">
                 <?php 
                 foreach ( $available_filters as $filter_id => $filter ) {
-                    $this->render_filter_field( $filter_id, $filter );
+                    $this->render_filter_field( $filter_id, $filter, $show_count );
                 }
                 ?>
                 
@@ -63,10 +74,11 @@ class FAC_Shortcode {
         return ob_get_clean();
     }
 
-    private function render_filter_field( $filter_id, $filter ) {
+    private function render_filter_field( $filter_id, $filter, $show_count = true ) {
         $terms = $this->get_filter_terms( $filter['taxonomy'] );
         
         if ( empty( $terms ) ) {
+            error_log( "FAC Filter: Nu s-au găsit termeni pentru taxonomia: " . $filter['taxonomy'] );
             return;
         }
         ?>
@@ -75,7 +87,7 @@ class FAC_Shortcode {
                 <!-- Dropdown custom cu checkbox-uri pentru multiple select -->
                 <div class="fac-custom-dropdown" data-taxonomy="<?php echo esc_attr( $filter['taxonomy'] ); ?>">
                     <div class="fac-dropdown-toggle">
-                        <span class="fac-dropdown-placeholder">-- <?php echo esc_html( $filter['label'] ); ?> --</span>
+                        <span class="fac-dropdown-placeholder" style="text-align: center;"><?php echo esc_html( $filter['label'] ); ?></span>
                         <span class="fac-dropdown-arrow">▾</span>
                     </div>
                     <div class="fac-dropdown-content">
@@ -88,7 +100,7 @@ class FAC_Shortcode {
                                            class="fac-multiselect-checkbox">
                                     <label for="fac-<?php echo esc_attr( $filter['taxonomy'] ); ?>-<?php echo esc_attr( $term->slug ); ?>">
                                         <?php echo esc_html( $term->name ); ?>
-                                        <?php if ( $term->count > 0 ) : ?>
+                                        <?php if ( $show_count && $term->count > 0 ) : ?>
                                             <span class="fac-checkbox-count">(<?php echo $term->count; ?>)</span>
                                         <?php endif; ?>
                                     </label>
@@ -103,12 +115,12 @@ class FAC_Shortcode {
                 </div>
             <?php else : // select simplu sau checkbox ?>
                 <select name="filter_<?php echo esc_attr( $filter['taxonomy'] ); ?>" 
-                        id="fac-filter-<?php echo esc_attr( $filter_id ); ?>">
-                    <option value="">-- <?php echo esc_html( $filter['label'] ); ?> --</option>
+                        id="fac-filter-<?php echo esc_attr( $filter_id ); ?>" style="background-color: rgb(255 255 255 / 70%);">
+                    <option value="" style="text-align: center;"><?php echo esc_html( $filter['label'] ); ?></option>
                     <?php foreach ( $terms as $term ) : ?>
                         <option value="<?php echo esc_attr( $term->slug ); ?>">
                             <?php echo esc_html( $term->name ); ?>
-                            <?php if ( $term->count > 0 ) : ?>
+                            <?php if ( $show_count && $term->count > 0 ) : ?>
                                 (<?php echo $term->count; ?>)
                             <?php endif; ?>
                         </option>
@@ -235,14 +247,14 @@ class FAC_Shortcode {
             padding: 20px;
             border: 1px solid #e5e5e5;
             border-radius: 8px;
-            background: #fafafa;
+            background: rgb(250 250 250 / 20%);
         }
 
         .fac-menu-horizontal .fac-menu-form {
             display: flex;
             flex-wrap: wrap;
             gap: 15px;
-            align-items: start;
+            align-items: center;
         }
 
         .fac-menu-vertical .fac-menu-form {
@@ -408,26 +420,6 @@ class FAC_Shortcode {
             margin-top: 10px;
         }
 
-        .fac-menu-btn {
-            background: #007cba;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .fac-menu-btn:hover {
-            background: #005a87;
-            transform: translateY(-1px);
-        }
-
         .fac-menu-btn .dashicons {
             font-size: 16px;
             width: 16px;
@@ -473,21 +465,34 @@ class FAC_Shortcode {
                 max-height: 70vh;
             }
         }
+			
+		button.fac-menu-btn {
+			color: var(--secondary);
+		}
+			
         </style>
         <?php
     }
 
     private function get_filter_terms( $taxonomy ) {
         if ( ! taxonomy_exists( $taxonomy ) ) {
+            error_log( "FAC Filter: Taxonomia {$taxonomy} nu există." );
             return [];
         }
 
-        return get_terms( [
+        $terms = get_terms( [
             'taxonomy'   => $taxonomy,
             'hide_empty' => true,
             'orderby'    => 'name',
             'order'      => 'ASC'
         ] );
+
+        if ( is_wp_error( $terms ) ) {
+            error_log( "FAC Filter: Eroare la obținerea termenilor pentru {$taxonomy}: " . $terms->get_error_message() );
+            return [];
+        }
+
+        return $terms;
     }
 
     private function get_shop_url() {
