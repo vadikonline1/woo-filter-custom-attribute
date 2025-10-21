@@ -117,7 +117,7 @@ class FAC_Filter_Widget extends WP_Widget {
             $checked = in_array( $term->slug, $current_terms ) ? 'checked' : '';
             $disabled = ( $term->count === 0 ) ? 'disabled' : '';
             
-            echo '<label class="fac-filter-label ' . $disabled . '">';
+            echo '<label class="fac-filter-label ' . esc_attr( $term->slug ) . $disabled . '">';
             echo '<input type="checkbox" value="' . esc_attr( $term->slug ) . '" ' . $checked . ' ' . $disabled . ' class="fac-checkbox">';
             echo '<span class="fac-filter-text">';
             echo '<span class="fac-filter-name">' . esc_html( $term->name ) . '</span>';
