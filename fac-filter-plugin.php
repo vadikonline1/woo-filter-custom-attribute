@@ -34,7 +34,7 @@ function fac_enqueue_assets() {
 add_action( 'wp_enqueue_scripts', 'fac_enqueue_assets' );
 
 add_filter('plugin_action_links_' . plugin_basename(__FILE__), function($actions) {
-    $settings_link = '<a href="' . admin_url('options-general.php?page=popup-banner-settings') . '">⚙️ Settings</a>';
+    $settings_link = '<a href="' . admin_url('admin.php?page=fac-settings') . '">⚙️ Settings</a>';
     array_unshift($actions, $settings_link);
     
     // Numele plugin-ului necesar
