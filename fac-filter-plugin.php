@@ -2,7 +2,7 @@
 /**
  * Plugin Name: FAC - Filter Custom Attribute
  * Description: Un plugin de filtrare WooCommerce după taxonomii/atribute personalizate.
- * Version: 1.0.2
+ * Version: 1.0.3
  * Author: Steel..xD
  * Plugin URI: https://github.com/vadikonline1/woo-filter-custom-attribute/
  * Author URI: https://github.com/vadikonline1/woo-filter-custom-attribute/
